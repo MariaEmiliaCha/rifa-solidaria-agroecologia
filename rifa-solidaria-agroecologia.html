@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rifa Solidaria - Ingeniería Agroambiental UTEC</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+</head>
+<body class="bg-green-50">
+    <header class="bg-green-600 text-white p-4">
+        <h1 class="text-2xl font-bold text-center">Rifa Solidaria - Ingeniería Agroambiental UTEC</h1>
+    </header>
+    
+    <main class="container mx-auto mt-8 p-4">
+        <section class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4">Nuestra Causa</h2>
+            <p class="mb-4">Somos 4 estudiantes de Ingeniería Agroambiental de la UTEC y organizamos esta rifa solidaria para recaudar fondos para participar y presentar los resultados de nuestros proyectos en el X Congreso Latinoamericano de Agroecología, que se realizará entre los días 23 al 25 de octubre, en Asunción, Paraguay.</p>
+            <p>¡Con su colaboración podremos representar a Uruguay en este importante evento!</p>
+        </section>
+        
+        <section class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4">Premios</h2>
+            <ul class="list-disc pl-5">
+                <li>1er Premio: Gafas inteligentes</li>
+                <li>2do Premio: Reloj inteligente</li>
+                <li>3er Premio: Whisky Chivas Regal 12 años</li>
+            </ul>
+        </section>
+        
+        <section class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4">Comprar Números</h2>
+            <p class="mb-4">Costo por número: $150 pesos uruguayos</p>
+            <form id="rifaForm">
+                <div class="mb-4">
+                    <label for="nombre" class="block mb-2">Nombre:</label>
+                    <input type="text" id="nombre" class="w-full border rounded px-3 py-2" required>
+                </div>
+                <div class="mb-4">
+                    <label for="email" class="block mb-2">Email:</label>
+                    <input type="email" id="email" class="w-full border rounded px-3 py-2" required>
+                </div>
+                <div class="mb-4">
+                    <label for="telefono" class="block mb-2">Teléfono:</label>
+                    <input type="tel" id="telefono" class="w-full border rounded px-3 py-2" required>
+                </div>
+                <div class="mb-4">
+                    <label for="numeros" class="block mb-2">Cantidad de números:</label>
+                    <input type="number" id="numeros" min="1" max="10" class="w-full border rounded px-3 py-2" required>
+                </div>
+                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Reservar Números</button>
+            </form>
+        </section>
+        
+        <section class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold mb-4">Información Importante</h2>
+            <ul class="list-disc pl-5">
+                <li>El sorteo se realizará el 15 de octubre de 2024.</li>
+                <li>Los ganadores serán contactados por email y teléfono.</li>
+                <li>Los premios se entregarán en la sede de UTEC en Montevideo.</li>
+                <li>La rifa está limitada a 500 números.</li>
+            </ul>
+        </section>
+    </main>
+    
+    <footer class="bg-green-200 text-center p-4 mt-8">
+        <p>&copy; 2024 Estudiantes de Ingeniería Agroambiental UTEC. Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+        document.getElementById('rifaForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('¡Gracias por tu apoyo! Te contactaremos pronto para confirmar tu compra y asignar tus números.');
+        });
+    </script>
+</body>
+</html>
