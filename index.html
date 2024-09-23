@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rifa Solidaria - Ingeniería Agroambiental UTEC</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+    <style>
+        .prize-image {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+    </style>
 </head>
 <body class="bg-green-50">
     <header class="bg-green-600 text-white p-4">
@@ -17,14 +26,23 @@
             <p class="mb-4">Somos 4 estudiantes de Ingeniería Agroambiental de la UTEC y organizamos esta rifa solidaria para recaudar fondos para participar y presentar los resultados de nuestros proyectos en el X Congreso Latinoamericano de Agroecología, que se realizará entre los días 23 al 25 de octubre, en Asunción, Paraguay.</p>
             <p>¡Con su colaboración podremos representar a Uruguay en este importante evento!</p>
         </section>
-        
+
         <section class="bg-white rounded-lg shadow-md p-6 mb-8">
             <h2 class="text-xl font-semibold mb-4">Premios</h2>
-            <ul class="list-disc pl-5">
-                <li>1er Premio: Gafas inteligentes</li>
-                <li>2do Premio: Reloj inteligente</li>
-                <li>3er Premio: Whisky Chivas Regal 12 años</li>
-            </ul>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="text-center">
+                    <img src="/api/placeholder/200/200" alt="Gafas inteligentes" class="prize-image mx-auto mb-2">
+                    <p>1er Premio: Gafas inteligentes</p>
+                </div>
+                <div class="text-center">
+                    <img src="/api/placeholder/200/200" alt="Reloj inteligente" class="prize-image mx-auto mb-2">
+                    <p>2do Premio: Reloj inteligente</p>
+                </div>
+                <div class="text-center">
+                    <img src="/api/placeholder/200/200" alt="Whisky Chivas Regal 12 años" class="prize-image mx-auto mb-2">
+                    <p>3er Premio: Whisky Chivas Regal 12 años</p>
+                </div>
+            </div>
         </section>
         
         <section class="bg-white rounded-lg shadow-md p-6 mb-8">
@@ -44,22 +62,20 @@
                     <input type="tel" id="telefono" class="w-full border rounded px-3 py-2" required>
                 </div>
                 <div class="mb-4">
-                    <label for="numeros" class="block mb-2">Cantidad de números:</label>
-                    <input type="number" id="numeros" min="1" max="10" class="w-full border rounded px-3 py-2" required>
+                    <label class="block mb-2">Seleccione sus números:</label>
+                    <div id="numerosContainer" class="grid grid-cols-10 gap-2">
+                        <!-- Numbers will be dynamically added here -->
+                    </div>
                 </div>
-                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Reservar Números</button>
+                <div class="mb-4">
+                    <p>Total a pagar: $<span id="totalPagar">0</span></p>
+                </div>
+                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Proceder al pago</button>
             </form>
         </section>
         
-        <section class="bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-xl font-semibold mb-4">Información Importante</h2>
-            <ul class="list-disc pl-5">
-                <li>El sorteo se realizará el 15 de octubre de 2024.</li>
-                <li>Los ganadores serán contactados por email y teléfono.</li>
-                <li>Los premios se entregarán en la sede de UTEC en Montevideo.</li>
-                <li>La rifa está limitada a 500 números.</li>
-            </ul>
-        </section>
+        <!-- Mercado Pago checkout button -->
+        <div id="wallet_container"></div>
     </main>
     
     <footer class="bg-green-200 text-center p-4 mt-8">
@@ -67,9 +83,80 @@
     </footer>
 
     <script>
+        const totalNumeros = 500;
+        const precioNumero = 150;
+        let numerosSeleccionados = [];
+
+        function generarNumeros() {
+            const container = document.getElementById('numerosContainer');
+            for (let i = 1; i <= totalNumeros; i++) {
+                const button = document.createElement('button');
+                button.textContent = i;
+                button.className = 'border p-2 text-center hover:bg-green-200';
+                button.onclick = () => seleccionarNumero(i, button);
+                container.appendChild(button);
+            }
+        }
+
+        function seleccionarNumero(numero, button) {
+            const index = numerosSeleccionados.indexOf(numero);
+            if (index > -1) {
+                numerosSeleccionados.splice(index, 1);
+                button.classList.remove('bg-green-500', 'text-white');
+            } else {
+                numerosSeleccionados.push(numero);
+                button.classList.add('bg-green-500', 'text-white');
+            }
+            actualizarTotal();
+        }
+
+        function actualizarTotal() {
+            const total = numerosSeleccionados.length * precioNumero;
+            document.getElementById('totalPagar').textContent = total;
+        }
+
+        generarNumeros();
+
+        // Mercado Pago integration
+        const mp = new MercadoPago('YOUR_PUBLIC_KEY_HERE');
+
         document.getElementById('rifaForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            alert('¡Gracias por tu apoyo! Te contactaremos pronto para confirmar tu compra y asignar tus números.');
+            if (numerosSeleccionados.length === 0) {
+                alert('Por favor, seleccione al menos un número.');
+                return;
+            }
+
+            const orderData = {
+                quantity: numerosSeleccionados.length,
+                description: `Rifa Solidaria - ${numerosSeleccionados.length} número(s)`,
+                price: precioNumero
+            };
+
+            fetch("/create_preference", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(orderData),
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(preference) {
+                mp.checkout({
+                    preference: {
+                        id: preference.id
+                    },
+                    render: {
+                        container: '#wallet_container',
+                        label: 'Pagar con Mercado Pago'
+                    }
+                });
+            })
+            .catch(function(error) {
+                console.log(error);
+            });
         });
     </script>
 </body>
